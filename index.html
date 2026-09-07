@@ -1,0 +1,203 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ZIET Mumbai – Digital Timetable</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f2f5f7;color:#18242e;font-family:Arial,sans-serif}
+header{background:#173f63;color:white;text-align:center;padding:17px 10px}
+.hi{font-size:18px;font-weight:bold}.en{font-size:16px;font-weight:bold;margin-top:4px}
+.sub{margin-top:10px;font-weight:bold}.title{font-size:20px;font-weight:800;margin:5px}
+.wrap{padding:14px;overflow-x:auto}.bar{max-width:1550px;margin:auto 0 12px;background:white;border:1px solid #d4dee6;border-radius:8px;padding:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bar button{padding:9px 13px;border:0;border-radius:6px;font-weight:bold;cursor:pointer}.save{background:#173f63;color:white}.print{background:#e8eef3;color:#173f63}.pdfbtn{text-decoration:none;display:inline-block}
+table{border-collapse:collapse;width:1550px;background:white;margin:auto;table-layout:fixed}
+th,td{border:1px solid #9fb0bd;vertical-align:top}th{background:#20537b;color:white;text-align:center;padding:10px 6px;font-size:14px}
+th:nth-child(1){width:105px}th:nth-child(2){width:180px}th:nth-child(n+3){width:310px}
+td{padding:9px;font-size:13px;line-height:1.35}.date{background:#edf3f7;text-align:center;color:#173f63}
+.topic{font-weight:700;font-size:14px;margin-bottom:6px}.speaker{font-size:12px;color:#3e4c57}
+.resource{border-top:1px dashed #a9b7c2;background:#f8fafb;margin-top:10px;padding:7px;font-size:11px;color:#1f587d}
+.resource input{display:block;width:100%;margin-top:5px;padding:6px;border:1px solid #b9c7d1;border-radius:5px;font-size:11px}
+.resource button{margin-top:5px;background:#21618c;color:white;border:0;border-radius:5px;padding:6px 9px;font-size:11px;font-weight:bold}
+.resource a{display:block;margin-top:5px;padding:5px;background:#eaf3f8;color:#075b8c;text-decoration:none;border-radius:4px;font-weight:bold;overflow-wrap:anywhere}
+.resource a:hover{text-decoration:underline}.remove{float:right;background:#f0d4d4!important;color:#8a1d1d!important;padding:3px 5px!important}
+.note{max-width:1550px;margin:10px auto;color:#596773;font-size:12px}
+@media print{.bar,.note{display:none}table{width:100%}.resource input,.resource button{display:none}.resource{font-size:9px}}
+</style></head>
+<body>
+<header>
+<div class="hi">केन्द्रीय विद्यालय संगठन, आंचलिक शिक्षा एवं प्रशिक्षण संस्थान, मुंबई</div>
+<div class="en">KENDRIYA VIDYALAYA SANGATHAN, ZONAL INSTITUTE OF EDUCATION AND TRAINING, MUMBAI</div>
+<div class="sub">5 Day Face-to-Face Workshop on</div>
+<div class="title">“Developing Leadership Competencies for Academic Excellence” for Vice Principals</div>
+<div>07.09.2026 to 11.09.2026</div>
+<div style="font-size:18px;font-weight:800;text-decoration:underline;margin-top:7px">TIME TABLE (TRAINING SCHEDULE)</div>
+</header>
+<div class="wrap">
+<div class="bar"><span style="margin-right:auto;font-size:13px"><b>Digital timetable:</b> add hyperlinks directly below the relevant session.</span>
+<button class="save" onclick="saveAll()">💾 Save Resources</button>
+<button class="save" onclick="syncAllToSheet()">📊 Sync to Google Sheet</button>
+<button class="print" onclick="generateCurrentPDF()">📄 Generate Current PDF</button>
+<button class="print" onclick="window.print()">🖨 Print</button>
+<button class="print" onclick="setupSheet()">⚙ Sheet Setup</button>
+<button class="print" onclick="clearAll()">↺ Clear Saved Links</button>
+<span id="sheetStatus" style="font-size:11px;font-weight:bold;color:#596773">Google Sheet: Not configured</span></div>
+<table><thead><tr>
+<th>Date</th><th>Morning Assembly<br><small>9.00–9.30 AM</small></th>
+<th>Session–1<br><small>9.30–11.00 AM</small></th>
+<th>Session–2<br><small>11.30 AM–1.00 PM</small></th>
+<th>Session–3<br><small>2.00–3.30 PM</small></th>
+<th>Session–4<br><small>4.00–5.30 PM</small></th>
+</tr></thead><tbody><tr><td class="date"><b>07.09.2026</b><br>Monday<br><strong>Day-1</strong></td><td><div class="topic">Inauguration</div><div class="resource"><b>🔗 Resources</b><input id="t-0-0" placeholder="Resource title"><input id="u-0-0" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('0-0')">Add Hyperlink</button><div id="l-0-0"></div></div></td><td><div class="topic">Role of the Vice Principal in School Leadership and Effective School Management</div><div class="speaker">Shri T. Prabhudas, Director, ZIET Mumbai</div><div class="resource"><b>🔗 Resources</b><input id="t-0-1" placeholder="Resource title"><input id="u-0-1" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('0-1')">Add Hyperlink</button><div id="l-0-1"></div></div></td><td><div class="topic">Redesigning Education: Nurturing Generation Alpha &amp; Beta as Global Citizens</div><div class="speaker">Dr. Coomi Vevaina, Former Professor, University of Mumbai (GS-1)</div><div class="resource"><b>🔗 Resources</b><input id="t-0-2" placeholder="Resource title"><input id="u-0-2" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('0-2')">Add Hyperlink</button><div id="l-0-2"></div></div></td><td><div class="topic">Instructional Leadership for Academic Excellence</div><div class="speaker">Smt. Shabana Khan, Principal, PM SHRI KV Lonavala (RP)</div><div class="resource"><b>🔗 Resources</b><input id="t-0-3" placeholder="Resource title"><input id="u-0-3" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('0-3')">Add Hyperlink</button><div id="l-0-3"></div></div></td><td><div class="topic">Competency-Based Education and Assessment</div><div class="speaker">Shri Feroz Khan, Principal, PM SHRI KV Ajni (RP)</div><div class="resource"><b>🔗 Resources</b><input id="t-0-4" placeholder="Resource title"><input id="u-0-4" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('0-4')">Add Hyperlink</button><div id="l-0-4"></div></div></td></tr><tr><td class="date"><b>08.09.2026</b><br>Tuesday<br><strong>Day-2</strong></td><td><div class="topic">Morning Assembly</div><div class="resource"><b>🔗 Resources</b><input id="t-1-0" placeholder="Resource title"><input id="u-1-0" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('1-0')">Add Hyperlink</button><div id="l-1-0"></div></div></td><td><div class="topic">Creating a Culture of Excellence and Innovation in Schools</div><div class="speaker">Prof. Parag Bhargava, IIT Bombay (GS)</div><div class="resource"><b>🔗 Resources</b><input id="t-1-1" placeholder="Resource title"><input id="u-1-1" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('1-1')">Add Hyperlink</button><div id="l-1-1"></div></div></td><td><div class="topic">Implementation &amp; Monitoring of PM SHRI Scheme</div><div class="speaker">Shri Feroz Khan, Principal, PM SHRI KV Ajni (RP)</div><div class="resource"><b>🔗 Resources</b><input id="t-1-2" placeholder="Resource title"><input id="u-1-2" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('1-2')">Add Hyperlink</button><div id="l-1-2"></div></div></td><td><div class="topic">Visionary Leadership for Transforming Vidyalayas</div><div class="speaker">Prof. Ashish Pandey, SJMSOM, IIT Bombay (GS-2)</div><div class="resource"><b>🔗 Resources</b><input id="t-1-3" placeholder="Resource title"><input id="u-1-3" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('1-3')">Add Hyperlink</button><div id="l-1-3"></div></div></td><td><div class="topic">Purchase Procedures and GFR Rules</div><div class="speaker">Shri Rajkumar Sharma, Section Officer (Accounts), KVS RO Mumbai (IS-1)</div><div class="resource"><b>🔗 Resources</b><input id="t-1-4" placeholder="Resource title"><input id="u-1-4" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('1-4')">Add Hyperlink</button><div id="l-1-4"></div></div></td></tr><tr><td class="date"><b>09.09.2026</b><br>Wednesday<br><strong>Day-3</strong></td><td><div class="topic">Morning Assembly</div><div class="resource"><b>🔗 Resources</b><input id="t-2-0" placeholder="Resource title"><input id="u-2-0" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('2-0')">Add Hyperlink</button><div id="l-2-0"></div></div></td><td><div class="topic">Strategic Planning for School Improvement and Institutional Excellence</div><div class="speaker">Prof. Utpal Chattopadhyay, IIM Mumbai (GS-3)</div><div class="resource"><b>🔗 Resources</b><input id="t-2-1" placeholder="Resource title"><input id="u-2-1" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('2-1')">Add Hyperlink</button><div id="l-2-1"></div></div></td><td><div class="topic">Assessment and Evaluation</div><div class="speaker">Shri Feroz Khan, Principal, PM SHRI KV Ajni (RP)</div><div class="resource"><b>🔗 Resources</b><input id="t-2-2" placeholder="Resource title"><input id="u-2-2" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('2-2')">Add Hyperlink</button><div id="l-2-2"></div></div></td><td><div class="topic">Curricular Goals, Competencies &amp; Learning Outcomes (Foundational &amp; Preparatory)</div><div class="speaker">Smt. Shabana Khan, Principal, PM SHRI KV Lonavala (RP)</div><div class="resource"><b>🔗 Resources</b><input id="t-2-3" placeholder="Resource title"><input id="u-2-3" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('2-3')">Add Hyperlink</button><div id="l-2-3"></div></div></td><td><div class="topic">Artificial Intelligence for School Leaders</div><div class="speaker">Prof. Ramkumar Rajendran, IIT Bombay (GS-4)</div><div class="resource"><b>🔗 Resources</b><input id="t-2-4" placeholder="Resource title"><input id="u-2-4" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('2-4')">Add Hyperlink</button><div id="l-2-4"></div></div></td></tr><tr><td class="date"><b>10.09.2026</b><br>Thursday<br><strong>Day-4</strong></td><td><div class="topic">Morning Assembly</div><div class="resource"><b>🔗 Resources</b><input id="t-3-0" placeholder="Resource title"><input id="u-3-0" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('3-0')">Add Hyperlink</button><div id="l-3-0"></div></div></td><td><div class="topic">Inclusive Education</div><div class="speaker">Ms. Ritika Sahni, Trinayani Organization, Mumbai (GS-5)</div><div class="resource"><b>🔗 Resources</b><input id="t-3-1" placeholder="Resource title"><input id="u-3-1" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('3-1')">Add Hyperlink</button><div id="l-3-1"></div></div></td><td><div class="topic">Disciplinary Proceedings</div><div class="speaker">Shri Bajrang Singh, Administrative Officer, KVS RO Mumbai (IS-2)</div><div class="resource"><b>🔗 Resources</b><input id="t-3-2" placeholder="Resource title"><input id="u-3-2" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('3-2')">Add Hyperlink</button><div id="l-3-2"></div></div></td><td><div class="topic">Mental Health &amp; Well-being in Schools</div><div class="speaker">Dr. Nahid Dave, Consultant Psychiatrist, City Hospital &amp; Research Centre, Kurla, Mumbai (GS-6)</div><div class="resource"><b>🔗 Resources</b><input id="t-3-3" placeholder="Resource title"><input id="u-3-3" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('3-3')">Add Hyperlink</button><div id="l-3-3"></div></div></td><td><div class="topic">Curricular Goals, Competencies &amp; Learning Outcomes (Middle &amp; Secondary)</div><div class="speaker">Smt. Shabana Khan, Principal, PM SHRI KV Lonavala (RP)</div><div class="resource"><b>🔗 Resources</b><input id="t-3-4" placeholder="Resource title"><input id="u-3-4" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('3-4')">Add Hyperlink</button><div id="l-3-4"></div></div></td></tr><tr><td class="date"><b>11.09.2026</b><br>Friday<br><strong>Day-5</strong></td><td><div class="topic">Morning Assembly</div><div class="resource"><b>🔗 Resources</b><input id="t-4-0" placeholder="Resource title"><input id="u-4-0" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('4-0')">Add Hyperlink</button><div id="l-4-0"></div></div></td><td><div class="topic">Conflict Resolution, Emotional Intelligence &amp; Communication Skills</div><div class="speaker">Prof. Nikhil Mehta, IIM Mumbai (GS-7)</div><div class="resource"><b>🔗 Resources</b><input id="t-4-1" placeholder="Resource title"><input id="u-4-1" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('4-1')">Add Hyperlink</button><div id="l-4-1"></div></div></td><td><div class="topic">NEP 2020 in Action &amp; Effective Academic Planning</div><div class="speaker">Shri B.K. Behera, Deputy Commissioner, KVS RO Mumbai</div><div class="resource"><b>🔗 Resources</b><input id="t-4-2" placeholder="Resource title"><input id="u-4-2" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('4-2')">Add Hyperlink</button><div id="l-4-2"></div></div></td><td><div class="topic">Classroom Observation, Academic Supervision and Feedback Mechanisms</div><div class="speaker">Smt. Shabana Khan, Principal, PM SHRI KV Lonavala (RP)</div><div class="resource"><b>🔗 Resources</b><input id="t-4-3" placeholder="Resource title"><input id="u-4-3" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('4-3')">Add Hyperlink</button><div id="l-4-3"></div></div></td><td><div class="topic">Valedictory Session</div><div class="resource"><b>🔗 Resources</b><input id="t-4-4" placeholder="Resource title"><input id="u-4-4" placeholder="Paste Google Drive / PDF / PPT / Video / Website link"><button onclick="addLink('4-4')">Add Hyperlink</button><div id="l-4-4"></div></div></td></tr></tbody></table>
+<div class="note">Enter a resource title and URL below any session. The resource is saved in this browser and, once the Google Apps Script connector is configured, automatically sent to the linked Google Sheet. <a href="https://docs.google.com/spreadsheets/d/1E7RQRpCT23gRGNda4exqEBbgDdD6vRp0mmuNa1aDFSA/edit?usp=sharing" target="_blank">Open Google Sheet</a>. Click “Generate Current PDF” to create a fresh PDF containing the current resource names as clickable hyperlinks.</div>
+</div>
+<script>
+function generateCurrentPDF(){
+  saveAll();
+  const table = document.querySelector('table');
+  const clone = table.cloneNode(true);
+
+  // Convert every live resource into a compact clickable PDF link.
+  clone.querySelectorAll('[id^="l-"]').forEach(box=>{
+    const links = box.querySelectorAll('a');
+    const parent = box.closest('.resource');
+    if(!parent) return;
+
+    // Remove input controls/buttons in the cloned PDF.
+    parent.querySelectorAll('input,button').forEach(el=>el.remove());
+
+    if(links.length){
+      links.forEach(a=>{
+        a.setAttribute('href', a.href);
+        a.setAttribute('target','_blank');
+        a.style.display='block';
+        a.style.color='#075b8c';
+        a.style.textDecoration='underline';
+        a.style.fontWeight='700';
+      });
+    } else {
+      box.innerHTML = '<span style="color:#777">No resource link added</span>';
+    }
+  });
+
+  // Build a standalone print document. Browser's Save as PDF will preserve hyperlinks.
+  const w = window.open('', '_blank');
+  if(!w){ alert('Please allow pop-ups for this timetable, then try again.'); return; }
+
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8">
+  <title>ZIET Mumbai – Training Timetable with Resources</title>
+  <style>
+    @page{size:A3 landscape;margin:10mm}
+    body{font-family:Arial,sans-serif;color:#18242e;margin:0}
+    .head{text-align:center;background:#173f63;color:white;padding:12px}
+    .head .hi{font-size:16px;font-weight:700}.head .en{font-size:14px;font-weight:700;margin-top:3px}
+    .head .title{font-size:17px;font-weight:800;margin:7px}.head .small{font-size:12px}
+    table{border-collapse:collapse;width:100%;table-layout:fixed;margin-top:8px}
+    th,td{border:1px solid #8fa2b0;vertical-align:top}
+    th{background:#20537b;color:white;text-align:center;padding:7px;font-size:10px}
+    td{padding:6px;font-size:8.5px;line-height:1.25}
+    th:first-child{width:7%} th:nth-child(2){width:12%} th:nth-child(n+3){width:20.25%}
+    .date{background:#edf3f7;text-align:center;color:#173f63}
+    .topic{font-weight:700;font-size:9px;margin-bottom:4px}
+    .speaker{font-size:8px;color:#3e4c57}
+    .resource{margin-top:6px;padding-top:4px;border-top:1px dashed #9eacb8;background:#f7fafc;color:#1e587c}
+    .resource b{font-size:7.5px}.links a,.resource a{font-size:7.5px;display:block;margin-top:3px;color:#075b8c!important;text-decoration:underline!important;overflow-wrap:anywhere}
+  </style></head><body>
+  <div class="head">
+    <div class="hi">केन्द्रीय विद्यालय संगठन, आंचलिक शिक्षा एवं प्रशिक्षण संस्थान, मुंबई</div>
+    <div class="en">KENDRIYA VIDYALAYA SANGATHAN, ZONAL INSTITUTE OF EDUCATION AND TRAINING, MUMBAI</div>
+    <div class="small">5 Day Face-to-Face Workshop on</div>
+    <div class="title">“Developing Leadership Competencies for Academic Excellence” for Vice Principals</div>
+    <div class="small">07.09.2026 to 11.09.2026</div>
+    <div class="title" style="font-size:14px;text-decoration:underline">TIME TABLE (TRAINING SCHEDULE)</div>
+  </div>
+  ${clone.outerHTML}
+  </body></html>`);
+  w.document.close();
+  w.focus();
+
+  // Wait for the new document to render, then open print dialog.
+  setTimeout(()=>{w.print();},700);
+}
+</script>
+<script>
+const KEY='ZIET_VP_SAME_FORMAT_RESOURCES_2026';
+const SHEET_URL='https://docs.google.com/spreadsheets/d/1E7RQRpCT23gRGNda4exqEBbgDdD6vRp0mmuNa1aDFSA/edit?usp=sharing';
+const WEBAPP_KEY='ZIET_VP_GOOGLE_APPS_SCRIPT_WEBAPP_2026';
+function valid(u){try{const x=new URL(u);return x.protocol==='http:'||x.protocol==='https:'}catch(e){return false}}
+function getWebApp(){return localStorage.getItem(WEBAPP_KEY)||''}
+function status(msg,ok=false){const el=document.getElementById('sheetStatus');if(el){el.textContent=msg;el.style.color=ok?'#1b6e3a':'#8a5a00'}}
+function setupSheet(){
+  const current=getWebApp();
+  const u=prompt('Paste the Google Apps Script Web App URL ending in /exec.\n\nThis is the connector that writes the timetable resources into your Google Sheet.',current);
+  if(u===null)return;
+  const x=u.trim();
+  if(x && !/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/.test(x)){alert('That does not look like a Google Apps Script Web App /exec URL.');return}
+  if(x)localStorage.setItem(WEBAPP_KEY,x); else localStorage.removeItem(WEBAPP_KEY);
+  status(x?'Google Sheet: Connected':'Google Sheet: Not configured',!!x);
+  if(x) syncAllToSheet();
+}
+function sheetMeta(k){
+ const row=document.getElementById('l-'+k).closest('tr');
+ const cells=row.querySelectorAll('td');
+ const date=(cells[0]?.innerText||'').replace(/\n/g,' ').trim();
+ const idx=parseInt(k.split('-')[1],10)+1;
+ const topic=(cells[idx]?.querySelector('.topic')?.innerText||'').trim();
+ const speaker=(cells[idx]?.querySelector('.speaker')?.innerText||'').trim();
+ const headings=['Morning Assembly','Session–1','Session–2','Session–3','Session–4'];
+ return {date,session:headings[idx]||('Session-'+idx),topic,speaker,cellId:k};
+}
+function sendToSheet(payload){
+ const endpoint=getWebApp();
+ if(!endpoint){status('Google Sheet: Not configured');return Promise.resolve(false)}
+ const body=JSON.stringify(payload);
+ // no-cors allows the browser to send the request to Apps Script despite cross-origin restrictions.
+ return fetch(endpoint,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body})
+   .then(()=>{status('Google Sheet: Sync sent ✓',true);return true})
+   .catch(()=>{status('Google Sheet: Sync failed');return false});
+}
+function addLink(k){
+ const t=document.getElementById('t-'+k),u=document.getElementById('u-'+k);
+ if(!valid(u.value.trim())){alert('Please paste a valid http:// or https:// link.');return}
+ const box=document.getElementById('l-'+k),row=document.createElement('div');
+ const a=document.createElement('a');a.href=u.value.trim();a.target='_blank';a.rel='noopener';a.textContent=t.value.trim()||u.value.trim();
+ const b=document.createElement('button');b.className='remove';b.textContent='Remove';b.onclick=function(){
+   const resource={...sheetMeta(k),title:a.textContent,url:a.href}; row.remove(); saveAll(); deleteFromSheet(resource);
+ };
+ row.appendChild(a);row.appendChild(b);box.appendChild(row);t.value='';u.value='';saveAll();
+ syncResource(k,a.textContent,a.href);
+}
+function syncResource(k,title,url){
+ const m=sheetMeta(k); return sendToSheet({action:'upsert',...m,title,url});
+}
+function deleteFromSheet(resource){return sendToSheet({action:'delete',...resource})}
+function saveAll(){
+ const data={};
+ document.querySelectorAll('[id^="l-"]').forEach(box=>{data[box.id]=Array.from(box.querySelectorAll('a')).map(a=>({title:a.textContent,url:a.href}));});
+ localStorage.setItem(KEY,JSON.stringify(data));
+}
+function syncAllToSheet(){
+ const endpoint=getWebApp();
+ if(!endpoint){setupSheet();return}
+ const jobs=[];
+ document.querySelectorAll('[id^="l-"]').forEach(box=>{
+   const k=box.id.substring(2); box.querySelectorAll('a').forEach(a=>jobs.push(syncResource(k,a.textContent,a.href)));
+ });
+ if(!jobs.length){status('Google Sheet: Nothing to sync');return}
+ Promise.all(jobs).then(()=>status('Google Sheet: All resources sent ✓',true));
+}
+function restore(){
+ const raw=localStorage.getItem(KEY);if(!raw)return;
+ try{const data=JSON.parse(raw);Object.keys(data).forEach(id=>{
+   const box=document.getElementById(id);if(!box)return;
+   const k=id.substring(2);
+   (data[id]||[]).forEach(x=>{
+     if(!valid(x.url))return;
+     const row=document.createElement('div'),a=document.createElement('a'),b=document.createElement('button');
+     a.href=x.url;a.target='_blank';a.rel='noopener';a.textContent=x.title||x.url;
+     b.className='remove';b.textContent='Remove';b.onclick=function(){const resource={...sheetMeta(k),title:a.textContent,url:a.href};row.remove();saveAll();deleteFromSheet(resource)};
+     row.appendChild(a);row.appendChild(b);box.appendChild(row);
+   });
+ });}catch(e){}
+ const endpoint=getWebApp(); status(endpoint?'Google Sheet: Connected':'Google Sheet: Not configured',!!endpoint);
+}
+function clearAll(){if(confirm('Clear all saved resource hyperlinks from this browser?')){localStorage.removeItem(KEY);document.querySelectorAll('[id^="l-"]').forEach(x=>x.innerHTML='');status(getWebApp()?'Google Sheet: Connected':'Google Sheet: Not configured',!!getWebApp())}}
+restore();
+</script></body></html>

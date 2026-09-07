@@ -17,7 +17,7 @@ td{padding:9px;font-size:13px;line-height:1.35}.date{background:#edf3f7;text-ali
 .resource input{display:block;width:100%;margin-top:5px;padding:6px;border:1px solid #b9c7d1;border-radius:5px;font-size:11px}
 .resource button{margin-top:5px;background:#21618c;color:white;border:0;border-radius:5px;padding:6px 9px;font-size:11px;font-weight:bold}
 .resource a{display:block;margin-top:5px;padding:5px;background:#eaf3f8;color:#075b8c;text-decoration:none;border-radius:4px;font-weight:bold;overflow-wrap:anywhere}
-.resource a:hover{text-decoration:underline}.remove{float:right;background:#f0d4d4!important;color:#8a1d1d!important;padding:3px 5px!important}
+.resource a:hover{text-decoration:underline}.remove{float:right;background:#f0d4d4!important;color:#8a1d1d!important;padding:3px 5px!important}.edit{float:right;background:#e8f0fe!important;color:#174ea6!important;padding:3px 5px!important;margin-right:4px}
 .note{max-width:1550px;margin:10px auto;color:#596773;font-size:12px}
 @media print{.bar,.note{display:none}table{width:100%}.resource input,.resource button{display:none}.resource{font-size:9px}}
 </style></head>
@@ -38,7 +38,7 @@ td{padding:9px;font-size:13px;line-height:1.35}.date{background:#edf3f7;text-ali
 <button class="print" onclick="window.print()">🖨 Print</button>
 <button class="print" onclick="setupSheet()">⚙ Sheet Setup</button>
 <button class="print" onclick="clearAll()">↺ Clear Saved Links</button>
-<span id="sheetStatus" style="font-size:11px;font-weight:bold;color:#596773">Google Sheet: Not configured</span></div>
+<span id="sheetStatus" style="font-size:11px;font-weight:bold;color:#596773">Google Sheet: Connected ✓</span></div>
 <table><thead><tr>
 <th>Date</th><th>Morning Assembly<br><small>9.00–9.30 AM</small></th>
 <th>Session–1<br><small>9.30–11.00 AM</small></th>
@@ -121,8 +121,9 @@ function generateCurrentPDF(){
 const KEY='ZIET_VP_SAME_FORMAT_RESOURCES_2026';
 const SHEET_URL='https://docs.google.com/spreadsheets/d/1E7RQRpCT23gRGNda4exqEBbgDdD6vRp0mmuNa1aDFSA/edit?usp=sharing';
 const WEBAPP_KEY='ZIET_VP_GOOGLE_APPS_SCRIPT_WEBAPP_2026';
+const WEBAPP_URL='https://script.google.com/macros/s/AKfycbxi_gNSHPxrWFCzJ9ZYkagIV5ge1fN33Q42le1CQx6n3aH1nU309sFFA-tinLWhGeSfbg/exec';
 function valid(u){try{const x=new URL(u);return x.protocol==='http:'||x.protocol==='https:'}catch(e){return false}}
-function getWebApp(){return localStorage.getItem(WEBAPP_KEY)||''}
+function getWebApp(){return WEBAPP_URL||localStorage.getItem(WEBAPP_KEY)||''}
 function status(msg,ok=false){const el=document.getElementById('sheetStatus');if(el){el.textContent=msg;el.style.color=ok?'#1b6e3a':'#8a5a00'}}
 function setupSheet(){
   const current=getWebApp();
@@ -158,16 +159,35 @@ function addLink(k){
  if(!valid(u.value.trim())){alert('Please paste a valid http:// or https:// link.');return}
  const box=document.getElementById('l-'+k),row=document.createElement('div');
  const a=document.createElement('a');a.href=u.value.trim();a.target='_blank';a.rel='noopener';a.textContent=t.value.trim()||u.value.trim();
- const b=document.createElement('button');b.className='remove';b.textContent='Remove';b.onclick=function(){
-   const resource={...sheetMeta(k),title:a.textContent,url:a.href}; row.remove(); saveAll(); deleteFromSheet(resource);
- };
- row.appendChild(a);row.appendChild(b);box.appendChild(row);t.value='';u.value='';saveAll();
+ bindResourceRow(row,k,a);
+ row.appendChild(a);box.appendChild(row);t.value='';u.value='';saveAll();
  syncResource(k,a.textContent,a.href);
 }
 function syncResource(k,title,url){
  const m=sheetMeta(k); return sendToSheet({action:'upsert',...m,title,url});
 }
 function deleteFromSheet(resource){return sendToSheet({action:'delete',...resource})}
+function bindResourceRow(row,k,a){
+ const edit=document.createElement('button'); edit.className='edit'; edit.textContent='Edit';
+ edit.onclick=function(){
+   const oldTitle=a.textContent, oldUrl=a.href;
+   const newTitle=prompt('Edit resource title:',oldTitle);
+   if(newTitle===null)return;
+   const newUrl=prompt('Edit resource URL:',oldUrl);
+   if(newUrl===null)return;
+   const title=(newTitle.trim()||newUrl.trim()); const url=newUrl.trim();
+   if(!valid(url)){alert('Please enter a valid http:// or https:// link.');return}
+   const oldResource={...sheetMeta(k),title:oldTitle,url:oldUrl};
+   a.textContent=title; a.href=url;
+   saveAll();
+   deleteFromSheet(oldResource).then(()=>syncResource(k,title,url));
+ };
+ const remove=document.createElement('button'); remove.className='remove'; remove.textContent='Remove';
+ remove.onclick=function(){
+   const resource={...sheetMeta(k),title:a.textContent,url:a.href}; row.remove(); saveAll(); deleteFromSheet(resource);
+ };
+ row.appendChild(edit); row.appendChild(remove);
+}
 function saveAll(){
  const data={};
  document.querySelectorAll('[id^="l-"]').forEach(box=>{data[box.id]=Array.from(box.querySelectorAll('a')).map(a=>({title:a.textContent,url:a.href}));});
@@ -190,10 +210,10 @@ function restore(){
    const k=id.substring(2);
    (data[id]||[]).forEach(x=>{
      if(!valid(x.url))return;
-     const row=document.createElement('div'),a=document.createElement('a'),b=document.createElement('button');
+     const row=document.createElement('div'),a=document.createElement('a');
      a.href=x.url;a.target='_blank';a.rel='noopener';a.textContent=x.title||x.url;
-     b.className='remove';b.textContent='Remove';b.onclick=function(){const resource={...sheetMeta(k),title:a.textContent,url:a.href};row.remove();saveAll();deleteFromSheet(resource)};
-     row.appendChild(a);row.appendChild(b);box.appendChild(row);
+     bindResourceRow(row,k,a);
+     row.appendChild(a);box.appendChild(row);
    });
  });}catch(e){}
  const endpoint=getWebApp(); status(endpoint?'Google Sheet: Connected':'Google Sheet: Not configured',!!endpoint);

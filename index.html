@@ -39,7 +39,7 @@ td{padding:9px;font-size:13px;line-height:1.35}.date{background:#edf3f7;text-ali
 <button class="print" onclick="window.print()">🖨 Print</button>
 <button class="print" onclick="setupSheet()">⚙ Sheet Setup</button>
 <button class="print" onclick="clearAll()">↺ Clear Saved Links</button>
-<span id="sheetStatus" style="font-size:11px;font-weight:bold;color:#596773">Google Sheet: Connecting…</span></div>
+<span id="sheetStatus" style="font-size:11px;font-weight:bold;color:#596773"></span></div>
 <table><thead><tr>
 <th>Date</th><th>Morning Assembly<br><small>9.00–9.30 AM</small></th>
 <th>Session–1<br><small>9.30–11.00 AM</small></th>
@@ -224,7 +224,37 @@ function loadFromSheet(){
   const endpoint=getWebApp();
   if(!endpoint){status('Google Sheet: Not configured');return}
   status('Google Sheet: Loading…');
-  const token='ziet_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-  const iframe=document.createElement('iframe');
-  iframe.style.display='none';
-  iframe.src=endpoint+'?action=list&token='+encod
+  const callbackName='zietSheetCallback_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+  const script=document.createElement('script');
+  let done=false;
+  const timer=setTimeout(()=>{
+    if(done)return; done=true; cleanup(); status('Google Sheet: Load timed out');
+  },15000);
+  function cleanup(){
+    clearTimeout(timer);
+    try{delete window[callbackName]}catch(e){window[callbackName]=undefined}
+    if(script.parentNode)script.parentNode.removeChild(script);
+  }
+  window[callbackName]=function(d){
+    if(done)return;
+    done=true; cleanup();
+    if(d && d.ok){
+      renderSheetResources(d.resources||[]);
+      status('Google Sheet: Loaded '+(d.resources||[]).length+' resources ✓',true);
+    }else{
+      status('Google Sheet: Load failed — '+((d&&d.error)||'Unknown error'));
+    }
+  };
+  script.onerror=function(){
+    if(done)return; done=true; cleanup(); status('Google Sheet: Load failed — unable to reach Apps Script');
+  };
+  script.src=endpoint+'?action=list&callback='+encodeURIComponent(callbackName)+'&_='+Date.now();
+  document.body.appendChild(script);
+}
+function restore(){
+  // Google Sheet is the central database. Load it first on every device/browser.
+  loadFromSheet();
+}
+function clearAll(){if(confirm('Clear the links displayed on this browser? The Google Sheet remains the central database and will reload them next time.')){localStorage.removeItem(KEY);loadFromSheet()}}
+restore();
+</script></body></html>

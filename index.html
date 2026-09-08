@@ -32,13 +32,14 @@ td{padding:9px;font-size:13px;line-height:1.35}.date{background:#edf3f7;text-ali
 </header>
 <div class="wrap">
 <div class="bar"><span style="margin-right:auto;font-size:13px"><b>Digital timetable:</b> add hyperlinks directly below the relevant session.</span>
-<button class="save" onclick="saveAll()">💾 Save Resources</button>
+<button class="save" onclick="saveAndSync()">💾 Save Resources</button>
 <button class="save" onclick="syncAllToSheet()">📊 Sync to Google Sheet</button>
+<button class="print" onclick="loadFromSheet()">🔄 Load from Google Sheet</button>
 <button class="print" onclick="generateCurrentPDF()">📄 Generate Current PDF</button>
 <button class="print" onclick="window.print()">🖨 Print</button>
 <button class="print" onclick="setupSheet()">⚙ Sheet Setup</button>
 <button class="print" onclick="clearAll()">↺ Clear Saved Links</button>
-<span id="sheetStatus" style="font-size:11px;font-weight:bold;color:#596773">Google Sheet: Connected ✓</span></div>
+<span id="sheetStatus" style="font-size:11px;font-weight:bold;color:#596773">Google Sheet: Connecting…</span></div>
 <table><thead><tr>
 <th>Date</th><th>Morning Assembly<br><small>9.00–9.30 AM</small></th>
 <th>Session–1<br><small>9.30–11.00 AM</small></th>
@@ -121,7 +122,7 @@ function generateCurrentPDF(){
 const KEY='ZIET_VP_SAME_FORMAT_RESOURCES_2026';
 const SHEET_URL='https://docs.google.com/spreadsheets/d/1E7RQRpCT23gRGNda4exqEBbgDdD6vRp0mmuNa1aDFSA/edit?usp=sharing';
 const WEBAPP_KEY='ZIET_VP_GOOGLE_APPS_SCRIPT_WEBAPP_2026';
-const WEBAPP_URL='https://script.google.com/macros/s/AKfycbxi_gNSHPxrWFCzJ9ZYkagIV5ge1fN33Q42le1CQx6n3aH1nU309sFFA-tinLWhGeSfbg/exec';
+const WEBAPP_URL='https://script.google.com/macros/s/AKfycbw7QEIGFLgSknxWBEn5AfBu-RcPeR-DbLW5bpWZMhmESiDK3dO8z1J5FSIcp9xfJeq6DQ/exec';
 function valid(u){try{const x=new URL(u);return x.protocol==='http:'||x.protocol==='https:'}catch(e){return false}}
 function getWebApp(){return WEBAPP_URL||localStorage.getItem(WEBAPP_KEY)||''}
 function status(msg,ok=false){const el=document.getElementById('sheetStatus');if(el){el.textContent=msg;el.style.color=ok?'#1b6e3a':'#8a5a00'}}
@@ -194,30 +195,36 @@ function saveAll(){
  localStorage.setItem(KEY,JSON.stringify(data));
 }
 function syncAllToSheet(){
- const endpoint=getWebApp();
- if(!endpoint){setupSheet();return}
- const jobs=[];
- document.querySelectorAll('[id^="l-"]').forEach(box=>{
-   const k=box.id.substring(2); box.querySelectorAll('a').forEach(a=>jobs.push(syncResource(k,a.textContent,a.href)));
- });
- if(!jobs.length){status('Google Sheet: Nothing to sync');return}
- Promise.all(jobs).then(()=>status('Google Sheet: All resources sent ✓',true));
+  const endpoint=getWebApp();
+  if(!endpoint){setupSheet();return}
+  const jobs=[];
+  document.querySelectorAll('[id^="l-"]').forEach(box=>{
+    const k=box.id.substring(2);
+    box.querySelectorAll('a').forEach(a=>jobs.push(syncResource(k,a.textContent,a.href)));
+  });
+  if(!jobs.length){status('Google Sheet: Nothing to sync');return}
+  Promise.all(jobs).then(()=>status('Google Sheet: All resources sent ✓',true));
 }
-function restore(){
- const raw=localStorage.getItem(KEY);if(!raw)return;
- try{const data=JSON.parse(raw);Object.keys(data).forEach(id=>{
-   const box=document.getElementById(id);if(!box)return;
-   const k=id.substring(2);
-   (data[id]||[]).forEach(x=>{
-     if(!valid(x.url))return;
-     const row=document.createElement('div'),a=document.createElement('a');
-     a.href=x.url;a.target='_blank';a.rel='noopener';a.textContent=x.title||x.url;
-     bindResourceRow(row,k,a);
-     row.appendChild(a);box.appendChild(row);
-   });
- });}catch(e){}
- const endpoint=getWebApp(); status(endpoint?'Google Sheet: Connected':'Google Sheet: Not configured',!!endpoint);
+
+function renderSheetResources(items){
+  document.querySelectorAll('[id^="l-"]').forEach(x=>x.innerHTML='');
+  (items||[]).forEach(x=>{
+    if(!x.cellId || !valid(x.url)) return;
+    const box=document.getElementById('l-'+x.cellId);
+    if(!box) return;
+    const row=document.createElement('div'),a=document.createElement('a');
+    a.href=x.url;a.target='_blank';a.rel='noopener';a.textContent=x.title||x.url;
+    bindResourceRow(row,x.cellId,a);
+    row.appendChild(a);box.appendChild(row);
+  });
+  saveAll();
 }
-function clearAll(){if(confirm('Clear all saved resource hyperlinks from this browser?')){localStorage.removeItem(KEY);document.querySelectorAll('[id^="l-"]').forEach(x=>x.innerHTML='');status(getWebApp()?'Google Sheet: Connected':'Google Sheet: Not configured',!!getWebApp())}}
-restore();
-</script></body></html>
+
+function loadFromSheet(){
+  const endpoint=getWebApp();
+  if(!endpoint){status('Google Sheet: Not configured');return}
+  status('Google Sheet: Loading…');
+  const token='ziet_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+  const iframe=document.createElement('iframe');
+  iframe.style.display='none';
+  iframe.src=endpoint+'?action=list&token='+encod
